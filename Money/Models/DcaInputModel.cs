@@ -9,7 +9,7 @@ public class DcaInputModel
     public decimal MonthlyInvestment { get; set; }
 
     [Required(ErrorMessage = "預期年化報酬率為必填欄位")]
-    [Range(1, 15, ErrorMessage = "預期年化報酬率必須介於 1-15% 之間")]
+    [Range(1, 20, ErrorMessage = "預期年化報酬率必須介於 1-20% 之間")]
     public int AnnualRate { get; set; }
 
     [Required(ErrorMessage = "投資年數為必填欄位")]

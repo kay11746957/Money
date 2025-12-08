@@ -40,6 +40,7 @@
 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-lg" 
+                            @@click.prevent="calculate"
                             :disabled="!isValid || loading"
                             aria-label="計算定期定額複利結果">
                         <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

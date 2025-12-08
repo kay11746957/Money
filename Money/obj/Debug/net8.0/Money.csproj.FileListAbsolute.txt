@@ -1,11 +1,11 @@
+C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.exe
+C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.dll
 C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\appsettings.json
 C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.staticwebassets.runtime.json
 C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.staticwebassets.endpoints.json
-C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.exe
 C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.deps.json
 C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.runtimeconfig.json
-C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.dll
 C:\Users\kay11\Downloads\Money\Money\bin\Debug\net8.0\Money.pdb
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\rpswa.dswa.cache.json
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.GeneratedMSBuildEditorConfig.editorconfig
@@ -15,6 +15,7 @@ C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.csproj.CoreCompileIn
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.RazorAssemblyInfo.cache
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.RazorAssemblyInfo.cs
+C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.sourcelink.json
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\rjimswa.dswa.cache.json
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
@@ -30,4 +31,3 @@ C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\refint\Money.dll
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.pdb
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.genruntimeconfig.cache
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\ref\Money.dll
-C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.sourcelink.json

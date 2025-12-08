@@ -25,20 +25,10 @@ createApp({
     },
     watch: {
         'form.monthlyInvestment'(newValue) {
-            if (newValue <= 0) {
-                this.errors.monthlyInvestment = '月投入金額必須大於 0 元';
-            } else {
-                this.errors.monthlyInvestment = null;
-            }
+            this.validateMonthlyInvestment(newValue);
         },
         'form.years'(newValue) {
-            if (newValue < 1) {
-                this.errors.years = '投資年數至少 1 年';
-            } else if (newValue > 50) {
-                this.errors.years = '投資年數最多 50 年';
-            } else {
-                this.errors.years = null;
-            }
+            this.validateYears(newValue);
         },
     },
     methods: {
@@ -64,7 +54,7 @@ createApp({
                 }
 
                 this.result = await response.json();
-                
+
                 // Use nextTick to ensure the DOM is updated before rendering the chart
                 this.$nextTick(() => {
                     this.renderChart();
@@ -107,7 +97,7 @@ createApp({
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                callback: function(value) {
+                                callback: function (value) {
                                     if (value >= 1000000) return (value / 1000000) + 'M';
                                     if (value >= 1000) return (value / 1000) + 'K';
                                     return value;
@@ -118,7 +108,7 @@ createApp({
                     plugins: {
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     let label = context.dataset.label || '';
                                     if (label) {
                                         label += ': ';
@@ -136,13 +126,44 @@ createApp({
         },
         formatCurrency(value) {
             return new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(value);
+        },
+        validateMonthlyInvestment(value) {
+            if (value <= 0) {
+                this.errors.monthlyInvestment = '月投入金額必須大於 0 元';
+            } else {
+                this.errors.monthlyInvestment = null;
+            }
+        },
+        validateYears(value) {
+            if (value < 1) {
+                this.errors.years = '投資年數至少 1 年';
+            } else if (value > 50) {
+                this.errors.years = '投資年數最多 50 年';
+            } else {
+                this.errors.years = null;
+            }
         }
     },
     mounted() {
+        // Validate initial values
+        this.validateMonthlyInvestment(this.form.monthlyInvestment);
+        this.validateYears(this.form.years);
+
         // Add a link to Bootstrap Icons
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css';
         document.head.appendChild(link);
+
+        // Manually bind button click event (workaround for Vue event binding issue)
+        this.$nextTick(() => {
+            const button = document.querySelector('button[type="submit"]');
+            if (button) {
+                button.onclick = (e) => {
+                    e.preventDefault();
+                    this.calculate();
+                };
+            }
+        });
     }
 }).mount('#app');
