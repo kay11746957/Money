@@ -8,6 +8,7 @@ createApp({
                 annualRate: 6,
                 years: 20,
             },
+            annualRates: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20],
             errors: {
                 monthlyInvestment: null,
                 years: null,

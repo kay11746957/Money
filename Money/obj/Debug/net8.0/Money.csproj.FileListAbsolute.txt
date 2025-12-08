@@ -30,3 +30,4 @@ C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\refint\Money.dll
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.pdb
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.genruntimeconfig.cache
 C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\ref\Money.dll
+C:\Users\kay11\Downloads\Money\Money\obj\Debug\net8.0\Money.sourcelink.json

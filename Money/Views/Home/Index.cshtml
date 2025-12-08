@@ -23,7 +23,7 @@
                     <select id="annualRate" class="form-select form-select-lg" 
                             v-model.number="form.annualRate" 
                             aria-label="選擇預期年化報酬率">
-                        <option v-for="n in 15" :value="n">{{ n }}%</option>
+                        <option v-for="rate in annualRates" :value="rate">{{ rate }}%</option>
                     </select>
                 </div>
 
