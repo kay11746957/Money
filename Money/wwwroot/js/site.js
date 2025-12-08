@@ -66,68 +66,95 @@ createApp({
             }
         },
         renderChart() {
+            // Destroy existing chart first
+            if (this.chart) {
+                try {
+                    this.chart.destroy();
+                    this.chart = null;
+                } catch (e) {
+                    console.warn('Error destroying chart:', e);
+                }
+            }
+
             const canvas = document.getElementById('dca-chart');
             if (!canvas) {
                 console.warn('Canvas element not found, skipping chart render');
                 return;
             }
 
-            const ctx = canvas.getContext('2d');
+            // Verify canvas is in DOM and accessible
+            if (!canvas.ownerDocument || !document.body.contains(canvas)) {
+                console.warn('Canvas not in DOM, skipping chart render');
+                return;
+            }
+
+            let ctx;
+            try {
+                ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    console.warn('Cannot get canvas context, skipping chart render');
+                    return;
+                }
+            } catch (e) {
+                console.warn('Error getting canvas context:', e);
+                return;
+            }
+
             const labels = this.result.yearlyBreakdown.map(d => d.year);
             const data = this.result.yearlyBreakdown.map(d => d.value);
 
-            if (this.chart) {
-                this.chart.destroy();
-            }
-
-            this.chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '資產總值',
-                        data: data,
-                        borderColor: '#7c3aed',
-                        backgroundColor: 'rgba(124, 58, 237, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        pointHoverRadius: 6,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function (value) {
-                                    if (value >= 1000000) return (value / 1000000) + 'M';
-                                    if (value >= 1000) return (value / 1000) + 'K';
-                                    return value;
+            try {
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '資產總值',
+                            data: data,
+                            borderColor: '#7c3aed',
+                            backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        if (value >= 1000000) return (value / 1000000) + 'M';
+                                        if (value >= 1000) return (value / 1000) + 'K';
+                                        return value;
+                                    }
                                 }
                             }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(context.parsed.y);
+                                        }
+                                        return label;
                                     }
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(context.parsed.y);
-                                    }
-                                    return label;
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            } catch (e) {
+                console.error('Error creating chart:', e);
+            }
         },
         formatCurrency(value) {
             return new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(value);
