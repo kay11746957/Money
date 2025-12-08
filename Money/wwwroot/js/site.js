@@ -50,9 +50,12 @@ createApp({
                     const data = await response.json();
                     this.result = data;
 
-                    // Wait for DOM to update before rendering chart
+                    // Wait for DOM to update, then delay chart rendering to ensure canvas is fully ready
                     this.$nextTick(() => {
-                        this.renderChart();
+                        // Additional delay to ensure canvas is fully mounted and stable
+                        setTimeout(() => {
+                            this.renderChart();
+                        }, 500);
                     });
                 } else {
                     console.error('Calculation failed');
