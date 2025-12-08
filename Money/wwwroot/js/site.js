@@ -36,7 +36,6 @@ createApp({
             if (!this.isValid) return;
 
             this.loading = true;
-            this.result = null;
 
             try {
                 const response = await fetch('/Home/Calculate', {
@@ -47,21 +46,21 @@ createApp({
                     body: JSON.stringify(this.form),
                 });
 
-                if (!response.ok) {
-                    // Handle validation errors from backend if needed
+                if (response.ok) {
+                    const data = await response.json();
+                    this.result = data;
+
+                    // Wait for DOM to update before rendering chart
+                    this.$nextTick(() => {
+                        this.renderChart();
+                    });
+                } else {
                     console.error('Calculation failed');
-                    return;
+                    alert('計算失敗，請稍後再試');
                 }
-
-                this.result = await response.json();
-
-                // Use nextTick to ensure the DOM is updated before rendering the chart
-                this.$nextTick(() => {
-                    this.renderChart();
-                });
-
             } catch (error) {
-                console.error('An error occurred:', error);
+                console.error('Error:', error);
+                alert('發生錯誤，請稍後再試');
             } finally {
                 this.loading = false;
             }
