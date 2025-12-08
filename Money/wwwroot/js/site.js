@@ -1,4 +1,4 @@
-const { createApp } = Vue;
+const { createApp, markRaw } = Vue;
 
 createApp({
     data() {
@@ -107,7 +107,7 @@ createApp({
             const data = this.result.yearlyBreakdown.map(d => d.value);
 
             try {
-                this.chart = new Chart(ctx, {
+                this.chart = markRaw(new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
@@ -154,7 +154,7 @@ createApp({
                             }
                         }
                     }
-                });
+                }));
             } catch (e) {
                 console.error('Error creating chart:', e);
             }
