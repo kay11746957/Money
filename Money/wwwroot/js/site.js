@@ -67,7 +67,13 @@ createApp({
             }
         },
         renderChart() {
-            const ctx = document.getElementById('dca-chart').getContext('2d');
+            const canvas = document.getElementById('dca-chart');
+            if (!canvas) {
+                console.warn('Canvas element not found, skipping chart render');
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
             const labels = this.result.yearlyBreakdown.map(d => d.year);
             const data = this.result.yearlyBreakdown.map(d => d.value);
 
