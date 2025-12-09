@@ -76,12 +76,10 @@ namespace Money.Specs.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("計算器頁面存在")]
         [NUnit.Framework.CategoryAttribute("WalkingSkeleton")]
-        [NUnit.Framework.CategoryAttribute("skip")]
         public void 計算器頁面存在()
         {
             string[] tagsOfScenario = new string[] {
-                    "WalkingSkeleton",
-                    "skip"};
+                    "WalkingSkeleton"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("計算器頁面存在", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 8
@@ -98,7 +96,7 @@ namespace Money.Specs.Features
     testRunner.Given("我開啟瀏覽器進入首頁", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "假設");
 #line hidden
 #line 10
-    testRunner.Then("頁面標題應該包含 \"定期定額\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+    testRunner.Then("頁面標題應該包含 \"被動指數投資\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
 #line hidden
             }
             this.ScenarioCleanup();
