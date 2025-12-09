@@ -74,16 +74,16 @@ namespace Money.Specs.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("計算成功後顯示圖表")]
+        [NUnit.Framework.DescriptionAttribute("初始頁面載入與預設值")]
         [NUnit.Framework.CategoryAttribute("Calculator")]
-        [NUnit.Framework.CategoryAttribute("Chart")]
-        public void 計算成功後顯示圖表()
+        [NUnit.Framework.CategoryAttribute("InitialLoad")]
+        public void 初始頁面載入與預設值()
         {
             string[] tagsOfScenario = new string[] {
                     "Calculator",
-                    "Chart"};
+                    "InitialLoad"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("計算成功後顯示圖表", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("初始頁面載入與預設值", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 8
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -108,6 +108,119 @@ namespace Money.Specs.Features
 #line hidden
 #line 13
     testRunner.And("顯示投資年數輸入欄位", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "並且");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("手機版自適應顯示")]
+        [NUnit.Framework.CategoryAttribute("Calculator")]
+        [NUnit.Framework.CategoryAttribute("RWD")]
+        [NUnit.Framework.CategoryAttribute("Mobile")]
+        public void 手機版自適應顯示()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "Calculator",
+                    "RWD",
+                    "Mobile"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("手機版自適應顯示", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 16
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 17
+    testRunner.Given("我用手機尺寸 375x667 瀏覽計算機頁面 \"/calculator/dca\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "假設");
+#line hidden
+#line 18
+    testRunner.Then("計算機頁面無橫向捲軸", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+#line hidden
+#line 19
+    testRunner.And("輸入欄位寬度自適應", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "並且");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("即時驗證無效輸入")]
+        [NUnit.Framework.CategoryAttribute("Calculator")]
+        [NUnit.Framework.CategoryAttribute("Validation")]
+        public void 即時驗證無效輸入()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "Calculator",
+                    "Validation"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("即時驗證無效輸入", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 22
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 23
+    testRunner.Given("我開啟瀏覽器進入計算機頁面 \"/calculator/dca\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "假設");
+#line hidden
+#line 24
+    testRunner.When("我輸入月投入金額為 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "當");
+#line hidden
+#line 25
+    testRunner.Then("顯示錯誤訊息 \"月投入金額必須大於 0 元\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+#line hidden
+#line 26
+    testRunner.When("我輸入投資年數為 51", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "當");
+#line hidden
+#line 27
+    testRunner.Then("顯示錯誤訊息 \"投資年數最多 50 年\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("計算成功後顯示圖表")]
+        [NUnit.Framework.CategoryAttribute("Calculator")]
+        [NUnit.Framework.CategoryAttribute("Chart")]
+        public void 計算成功後顯示圖表()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "Calculator",
+                    "Chart"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("計算成功後顯示圖表", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 30
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 31
+    testRunner.Given("我開啟瀏覽器進入計算機頁面 \"/calculator/dca\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "假設");
+#line hidden
+#line 32
+    testRunner.When("我點擊計算按鈕", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "當");
+#line hidden
+#line 33
+    testRunner.Then("顯示計算結果區塊", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+#line hidden
+#line 34
+    testRunner.And("顯示圖表容器", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "並且");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -41,6 +41,38 @@ namespace Money.Specs.StepDefinitions
             Assert.That(calculateButton.Displayed, Is.True, "應該顯示計算按鈕");
         }
 
+        [Then(@"顯示勞保年金區塊")]
+        public void Then顯示勞保年金區塊()
+        {
+            var laborInsurance = _driver.FindElement(By.CssSelector(".labor-insurance-settings"));
+            Assert.That(laborInsurance.Displayed, Is.True, "應該顯示勞保年金區塊");
+        }
+
+        [Then(@"顯示勞保計算方式選項")]
+        public void Then顯示勞保計算方式選項()
+        {
+            var simpleCalc = _driver.FindElement(By.Id("simpleCalc"));
+            var manualInput = _driver.FindElement(By.Id("manualInput"));
+            Assert.That(simpleCalc.Displayed || manualInput.Displayed, Is.True, "應該顯示勞保計算方式選項");
+        }
+
+        [When(@"我點擊 FIRE 計算按鈕")]
+        public void When我點擊FIRE計算按鈕()
+        {
+            var button = _driver.FindElement(By.CssSelector("button[type='submit']"));
+            ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].scrollIntoView(true);", button);
+            System.Threading.Thread.Sleep(300);
+            ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", button);
+            System.Threading.Thread.Sleep(1500);
+        }
+
+        [Then(@"顯示 FIRE 計算結果區塊")]
+        public void Then顯示FIRE計算結果區塊()
+        {
+            var resultCard = _driver.FindElement(By.CssSelector(".result-card"));
+            Assert.That(resultCard.Displayed, Is.True, "應該顯示 FIRE 計算結果區塊");
+        }
+
         [AfterScenario]
         public void CleanUp()
         {

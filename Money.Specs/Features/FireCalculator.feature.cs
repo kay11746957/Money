@@ -109,6 +109,74 @@ namespace Money.Specs.Features
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("勞保年金簡易概算模式")]
+        [NUnit.Framework.CategoryAttribute("UI")]
+        [NUnit.Framework.CategoryAttribute("LaborInsurance")]
+        public void 勞保年金簡易概算模式()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "UI",
+                    "LaborInsurance"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("勞保年金簡易概算模式", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 15
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 16
+    testRunner.Given("我開啟瀏覽器進入 FIRE 計算機 \"/calculator/fire\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "假設");
+#line hidden
+#line 17
+    testRunner.Then("顯示勞保年金區塊", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+#line hidden
+#line 18
+    testRunner.And("顯示勞保計算方式選項", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "並且");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("計算成功後顯示結果")]
+        [NUnit.Framework.CategoryAttribute("Calculator")]
+        [NUnit.Framework.CategoryAttribute("Result")]
+        public void 計算成功後顯示結果()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "Calculator",
+                    "Result"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("計算成功後顯示結果", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 21
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 22
+    testRunner.Given("我開啟瀏覽器進入 FIRE 計算機 \"/calculator/fire\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "假設");
+#line hidden
+#line 23
+    testRunner.When("我點擊 FIRE 計算按鈕", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "當");
+#line hidden
+#line 24
+    testRunner.Then("顯示 FIRE 計算結果區塊", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore
