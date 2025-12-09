@@ -1,0 +1,176 @@
+@{
+    ViewData["Title"] = "退休金缺口與投資計算器";
+}
+
+<div class="calculator-page">
+    <div class="container py-5">
+        <div id="app" class="d-flex justify-content-center">
+            <div class="card shadow-lg rounded-lg calculator-card p-4 p-md-5" style="max-width: 700px; width: 100%;">
+                <div class="card-body">
+                    <h1 class="card-title text-center h3 mb-2">💰 退休金缺口與投資計算器</h1>
+                    <p class="text-center text-muted mb-4">計算每月需要投資多少，才能安心退休</p>
+
+                    <form v-on:submit.prevent="calculate" novalidate>
+                        <!-- 基本設定區塊 -->
+                        <div class="basic-settings mb-4">
+                            <h5 class="section-header">📋 基本設定</h5>
+                            
+                            <div class="mb-3">
+                                <label for="monthlyExpense" class="form-label fw-bold">預計退休每月提取金額 (NTD)</label>
+                                <input type="number" id="monthlyExpense" class="form-control" 
+                                       v-model.number="form.monthlyExpense" required>
+                                <div class="form-text">以今日購買力計算，已考慮通膨影響</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="yearsToRetire" class="form-label fw-bold">還有幾年退休</label>
+                                    <input type="number" id="yearsToRetire" class="form-control" 
+                                           v-model.number="form.yearsToRetire" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="yearsInRetirement" class="form-label fw-bold">預計提領年數</label>
+                                    <input type="number" id="yearsInRetirement" class="form-control" 
+                                           v-model.number="form.yearsInRetirement" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="currentAssets" class="form-label fw-bold">現有資產 (目前的退休金)</label>
+                                <input type="number" id="currentAssets" class="form-control" 
+                                       v-model.number="form.currentAssets" required>
+                                <div class="form-text">目前已有的儲蓄或退休金</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="annualReturn" class="form-label fw-bold">投資年化報酬率</label>
+                                    <select id="annualReturn" class="form-select" v-model.number="form.annualReturn">
+                                        <option v-for="rate in returnRates" :value="rate">{{ rate }}%</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="inflationRate" class="form-label fw-bold">預期通膨率</label>
+                                    <select id="inflationRate" class="form-select" v-model.number="form.inflationRate">
+                                        <option v-for="rate in inflationRates" :value="rate">{{ rate }}%</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 勞保年金區塊 -->
+                        <div class="labor-insurance-settings mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="section-header mb-0">🏛️ 勞保年金</h5>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="includeLaborInsurance" 
+                                           v-model="form.includeLaborInsurance">
+                                    <label class="form-check-label" for="includeLaborInsurance">納入計算</label>
+                                </div>
+                            </div>
+                            
+                            <div v-if="form.includeLaborInsurance" class="ps-3 border-start border-3 border-primary">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">計算方式</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="laborCalcMethod" 
+                                               id="simpleCalc" value="simple" v-model="form.laborCalcMethod">
+                                        <label class="form-check-label" for="simpleCalc">簡易概算</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="laborCalcMethod" 
+                                               id="manualInput" value="manual" v-model="form.laborCalcMethod">
+                                        <label class="form-check-label" for="manualInput">自行輸入</label>
+                                    </div>
+                                </div>
+                                
+                                <div v-if="form.laborCalcMethod === 'simple'" class="mb-3">
+                                    <label for="avgSalary" class="form-label">平均月投保薪資</label>
+                                    <select id="avgSalary" class="form-select" v-model.number="form.avgSalary">
+                                        <option v-for="salary in salaryLevels" :value="salary">{{ formatNumber(salary) }} 元</option>
+                                    </select>
+                                    <div class="mt-2">
+                                        <label for="insuredYears" class="form-label">預估投保年資 (年)</label>
+                                        <input type="number" id="insuredYears" class="form-control" 
+                                               v-model.number="form.insuredYears">
+                                    </div>
+                                    <div class="mt-3 p-3 bg-light rounded">
+                                        <strong>預估勞保月領金額：</strong>
+                                        <span class="text-primary fs-5">{{ formatCurrency(laborInsuranceMonthly) }}</span>
+                                        <div class="form-text">公式：平均薪資 × 年資 × 1.55%</div>
+                                    </div>
+                                </div>
+                                
+                                <div v-else class="mb-3">
+                                    <label for="laborInsuranceAmount" class="form-label">預估勞保月領金額</label>
+                                    <input type="number" id="laborInsuranceAmount" class="form-control" 
+                                           v-model.number="form.laborInsuranceAmount">
+                                    <div class="form-text">建議至勞保局網站進行精確試算</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 勞退金區塊 -->
+                        <div class="labor-pension-settings mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="section-header mb-0">💼 勞退金</h5>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="includeLaborPension" 
+                                           v-model="form.includeLaborPension">
+                                    <label class="form-check-label" for="includeLaborPension">納入計算</label>
+                                </div>
+                            </div>
+                            
+                            <div v-if="form.includeLaborPension" class="ps-3 border-start border-3 border-success">
+                                <div class="mb-3">
+                                    <label for="laborPensionAmount" class="form-label">預估勞退月領金額</label>
+                                    <input type="number" id="laborPensionAmount" class="form-control" 
+                                           v-model.number="form.laborPensionAmount">
+                                    <div class="form-text">可至勞退個人專戶查詢試算</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" v-bind:disabled="loading">
+                                <span v-if="loading" class="spinner-border spinner-border-sm" role="status"></span>
+                                {{ loading ? '計算中...' : '計算每月需要投資多少錢？' }}
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- 結果區塊 -->
+                    <div v-if="result" class="mt-5 fade-in">
+                        <div class="card result-card rounded-lg p-4">
+                            <h4 class="text-center mb-4">📊 計算結果</h4>
+                            <div class="text-center mb-4">
+                                <div class="result-label">每月需要投資</div>
+                                <div class="result-value">{{ formatCurrency(result.monthlyInvestment) }}</div>
+                            </div>
+                            <hr>
+                            <div class="row text-center">
+                                <div class="col-md-4 mb-3">
+                                    <div class="result-label">退休所需總額</div>
+                                    <div class="fs-5">{{ formatCurrency(result.totalNeeded) }}</div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="result-label">預估退休收入</div>
+                                    <div class="fs-5 text-success">{{ formatCurrency(result.monthlyPension) }}/月</div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="result-label">需自備金額</div>
+                                    <div class="fs-5">{{ formatCurrency(result.gap) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="~/js/fire-calculator.js" asp-append-version="true"></script>
+}

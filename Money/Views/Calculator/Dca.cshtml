@@ -1,0 +1,93 @@
+@{
+    ViewData["Title"] = "定期定額複利計算機";
+}
+
+<div class="calculator-page">
+    <div class="container py-5">
+        <div id="app" class="d-flex justify-content-center">
+            <div class="card shadow-lg rounded-lg calculator-card p-4 p-md-5">
+                <div class="card-body">
+                    <h1 class="card-title text-center h3 mb-4">定期定額複利計算機 🚀</h1>
+
+                    <form v-on:submit.prevent="calculate" novalidate>
+                        <div class="mb-4">
+                            <label for="monthlyInvestment" class="form-label fw-bold text-secondary">月投入金額 (NTD)</label>
+                            <input type="number" id="monthlyInvestment" class="form-control form-control-lg" 
+                                   v-model.number="form.monthlyInvestment"
+                                   v-bind:class="{ 'is-invalid': errors.monthlyInvestment }"
+                                   aria-label="輸入每月投入金額"
+                                   required>
+                            <div v-if="errors.monthlyInvestment" class="invalid-feedback fade-in" role="alert">{{ errors.monthlyInvestment }}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="annualRate" class="form-label fw-bold text-secondary">預期年化報酬率 (%)</label>
+                            <select id="annualRate" class="form-select form-select-lg" 
+                                    v-model.number="form.annualRate" 
+                                    aria-label="選擇預期年化報酬率">
+                                <option v-for="rate in annualRates" :value="rate">{{ rate }}%</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="years" class="form-label fw-bold text-secondary">投資年數</label>
+                            <input type="number" id="years" class="form-control form-control-lg" 
+                                   v-model.number="form.years"
+                                   v-bind:class="{ 'is-invalid': errors.years }"
+                                   aria-label="輸入投資年數"
+                                   required>
+                            <div class="form-text">請輸入 1 到 50 之間的年數。</div>
+                            <div v-if="errors.years" class="invalid-feedback fade-in" role="alert">{{ errors.years }}</div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" 
+                                    v-bind:disabled="!isValid || loading"
+                                    aria-label="計算定期定額複利結果">
+                                <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                {{ loading ? '計算中...' : '馬上計算' }}
+                            </button>
+                        </div>
+                    </form>
+
+                    <div v-if="result" class="mt-5 fade-in" id="result-section">
+                        <div class="card result-card rounded-lg p-4">
+                            <div class="text-center">
+                                <div class="result-label">最終資產</div>
+                                <div class="result-value" aria-describedby="result-description">{{ formatCurrency(result.totalValue) }}</div>
+                            </div>
+                            <hr class="my-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="result-label">總投入本金</div>
+                                    <div>{{ formatCurrency(result.totalInvested) }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="result-label result-return">投資報酬 ↑</div>
+                                    <div class="result-return">{{ formatCurrency(result.totalReturn) }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p id="result-description" class="visually-hidden">
+                            計算結果：最終資產為 {{ formatCurrency(result.totalValue) }} 元，
+                            總投入本金為 {{ formatCurrency(result.totalInvested) }} 元，
+                            總投資報酬為 {{ formatCurrency(result.totalReturn) }} 元。
+                        </p>
+
+                        <!-- Chart Section -->
+                        <div class="mt-4">
+                            <canvas id="dca-chart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/dca-calculator.js" asp-append-version="true"></script>
+}

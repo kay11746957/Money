@@ -1,79 +1,86 @@
 ﻿@{
-    ViewData["Title"] = "定期定額複利計算機";
+    ViewData["Title"] = "被動指數投資 - 讓投資變得簡單";
 }
 
-<div id="app" class="d-flex justify-content-center align-items-center w-100">
-    <div class="card shadow-lg rounded-lg calculator-card p-4 p-md-5">
-        <div class="card-body">
-            <h1 class="card-title text-center h3 mb-4">定期定額複利計算機 🚀</h1>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">讓投資變得簡單</h1>
+        <p class="hero-subtitle">被動指數投資，穩健累積財富</p>
+        <div class="hero-actions">
+            <a href="/calculator/dca" class="btn btn-light btn-lg hero-cta">
+                開始計算
+            </a>
+            <a href="/learn/intro" class="btn btn-outline-light btn-lg hero-cta-secondary">
+                了解更多
+            </a>
+        </div>
+    </div>
+</section>
 
-            <form @@submit.prevent="calculate" novalidate>
-                <div class="mb-4">
-                    <label for="monthlyInvestment" class="form-label fw-bold text-secondary">月投入金額 (NTD)</label>
-                    <input type="number" id="monthlyInvestment" class="form-control form-control-lg" 
-                           v-model.number="form.monthlyInvestment"
-                           :class="{ 'is-invalid': errors.monthlyInvestment }"
-                           aria-label="輸入每月投入金額"
-                           required>
-                    <div v-if="errors.monthlyInvestment" class="invalid-feedback fade-in" role="alert">{{ errors.monthlyInvestment }}</div>
-                </div>
-
-                <div class="mb-4">
-                    <label for="annualRate" class="form-label fw-bold text-secondary">預期年化報酬率 (%)</label>
-                    <select id="annualRate" class="form-select form-select-lg" 
-                            v-model.number="form.annualRate" 
-                            aria-label="選擇預期年化報酬率">
-                        <option v-for="rate in annualRates" :value="rate">{{ rate }}%</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label for="years" class="form-label fw-bold text-secondary">投資年數</label>
-                    <input type="number" id="years" class="form-control form-control-lg" 
-                           v-model.number="form.years"
-                           :class="{ 'is-invalid': errors.years }"
-                           aria-label="輸入投資年數"
-                           required>
-                    <div class="form-text">請輸入 1 到 50 之間的年數。</div>
-                    <div v-if="errors.years" class="invalid-feedback fade-in" role="alert">{{ errors.years }}</div>
-                </div>
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg" 
-                            @@click.prevent="calculate"
-                            :disabled="!isValid || loading"
-                            aria-label="計算定期定額複利結果">
-                        <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        {{ loading ? '計算中...' : '馬上計算' }}
-                    </button>
-                </div>
-            </form>
-
-            <div v-if="result" class="mt-5 fade-in" id="result-section">
-                <div class="card result-card rounded-lg p-4">
-                    <div class="text-center">
-                        <div class="result-label">最終資產</div>
-                        <div class="result-value" aria-describedby="result-description">{{ formatCurrency(result.totalValue) }}</div>
-                    </div>
-                    <hr class="my-3">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="result-label">總投入本金</div>
-                            <div>{{ formatCurrency(result.totalInvested) }}</div>
-                        </div>
-                        <div class="text-end">
-                            <div class="result-label result-return">投資報酬 <i class="bi bi-arrow-up-right"></i></div>
-                            <div class="result-return">{{ formatCurrency(result.totalReturn) }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                 <p id="result-description" class="visually-hidden">
-                    計算結果：最終資產為 {{ formatCurrency(result.totalValue) }} 元，
-                    總投入本金為 {{ formatCurrency(result.totalInvested) }} 元，
-                    總投資報酬為 {{ formatCurrency(result.totalReturn) }} 元。
-                </p>
+<!-- Feature Cards Section -->
+<section class="feature-cards-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4 mb-4">
+                <a href="/calculator/dca" class="feature-card">
+                    <span class="feature-card-icon">🧮</span>
+                    <h3 class="feature-card-title">複利計算機</h3>
+                    <p class="feature-card-desc">計算定期定額投資的複利效果</p>
+                </a>
+            </div>
+            <div class="col-md-5 col-lg-4 mb-4">
+                <a href="/calculator/fire" class="feature-card">
+                    <span class="feature-card-icon">🔥</span>
+                    <h3 class="feature-card-title">退休金計算</h3>
+                    <p class="feature-card-desc">規劃你的退休金缺口與投資計劃</p>
+                </a>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Why Passive Investing Section -->
+<section class="why-passive-section">
+    <div class="container">
+        <h2 class="section-title text-center">📊 為什麼選擇被動投資</h2>
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-number">90%</span>
+                <span class="stat-desc">主動基金長期跑輸指數</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">0.03%</span>
+                <span class="stat-desc">指數基金超低費用率</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">20 年</span>
+                <span class="stat-desc">長期投資複利效果驚人</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Professor Quotes Section -->
+<section class="quotes-section">
+    <div class="container">
+        <h2 class="section-title text-center">💬 周冠男教授名言</h2>
+        <div class="quotes-carousel">
+            <div class="quote-item">
+                <span class="quote-icon">"</span>
+                <p class="quote-text">從長期的相對績效來看，約有 80% 到 90% 的主動型基金經理人未能跑贏大盤</p>
+                <span class="quote-author">— 周冠男 教授</span>
+            </div>
+            <div class="quote-item">
+                <span class="quote-icon">"</span>
+                <p class="quote-text">費用率是唯一可以確定影響長期報酬的因素</p>
+                <span class="quote-author">— 周冠男 教授</span>
+            </div>
+            <div class="quote-item">
+                <span class="quote-icon">"</span>
+                <p class="quote-text">低成本、長期持有、分散投資，才是財富累積的可靠途徑</p>
+                <span class="quote-author">— 周冠男 教授</span>
+            </div>
+        </div>
+    </div>
+</section>
