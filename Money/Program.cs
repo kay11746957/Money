@@ -4,7 +4,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<YahooFinanceService>();
 builder.Services.AddSingleton<DcaCalculatorService>();
+builder.Services.AddScoped<BacktestService>();
 
 var app = builder.Build();
 

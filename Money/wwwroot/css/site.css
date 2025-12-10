@@ -83,7 +83,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, #424242, #000000);
     padding: 2rem;
 }
 

@@ -28,6 +28,11 @@ public class CalculatorController : Controller
         return View();
     }
 
+    public IActionResult Backtest()
+    {
+        return View();
+    }
+
     [HttpPost]
     public IActionResult Calculate([FromBody] DcaInputModel input)
     {

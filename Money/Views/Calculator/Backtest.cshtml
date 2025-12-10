@@ -1,0 +1,462 @@
+@{
+    ViewData["Title"] = "ETF 歷史回測比較";
+}
+
+<div class="backtest-page">
+    <div class="container py-5">
+        <div id="app">
+            <div class="text-center mb-5">
+                <h1 class="h2 mb-3">📊 ETF 歷史回測比較</h1>
+                <p class="text-muted">比較台股與美股 ETF 的歷史績效，做出更好的投資決策</p>
+            </div>
+            <!-- 回測模式切換 -->
+            <div id="backtest-mode" class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="backtest-mode" id="mode-compare" 
+                               value="compare" v-model="backtestMode" data-mode="compare">
+                        <label class="btn btn-outline-primary" for="mode-compare">
+                            📊 ETF 比較
+                        </label>
+
+                        <input type="radio" class="btn-check" name="backtest-mode" id="mode-portfolio" 
+                               value="portfolio" v-model="backtestMode" data-mode="portfolio">
+                        <label class="btn btn-outline-primary" for="mode-portfolio">
+                            💼 投資組合
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ETF 選擇區塊 -->
+            <div id="etf-selection" class="card shadow-sm mb-4" v-show="backtestMode === 'compare'">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">選擇要比較的 ETF</h5>
+                    
+                    <!-- ETF 搜尋框 -->
+                    <div class="mb-3">
+                        <label for="etf-search" class="form-label">搜尋 ETF</label>
+                        <div class="position-relative">
+                            <input 
+                                type="text" 
+                                id="etf-search" 
+                                class="form-control form-control-lg"
+                                placeholder="輸入代碼或名稱搜尋..."
+                                v-model="searchQuery"
+                                v-on:focus="showDropdown = true"
+                                autocomplete="off"
+                            >
+                            <!-- 搜尋結果下拉選單 -->
+                            <div v-if="showDropdown && filteredEtfs.length > 0" class="etf-dropdown">
+                                <div class="etf-group" v-if="filteredTwEtfs.length > 0">
+                                    <div class="etf-group-header">🇹🇼 台股 ETF</div>
+                                    <div 
+                                        v-for="etf in filteredTwEtfs" 
+                                        :key="etf.symbol"
+                                        class="etf-option"
+                                        v-on:click="selectEtf(etf)"
+                                    >
+                                        <span class="etf-symbol">{{ etf.symbol }}</span>
+                                        <span class="etf-name">{{ etf.name }}</span>
+                                    </div>
+                                </div>
+                                <div class="etf-group" v-if="filteredUsEtfs.length > 0">
+                                    <div class="etf-group-header">🇺🇸 美股 ETF</div>
+                                    <div 
+                                        v-for="etf in filteredUsEtfs" 
+                                        :key="etf.symbol"
+                                        class="etf-option"
+                                        v-on:click="selectEtf(etf)"
+                                    >
+                                        <span class="etf-symbol">{{ etf.symbol }}</span>
+                                        <span class="etf-name">{{ etf.name }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已選擇的 ETF -->
+                    <div class="selected-etfs mt-4">
+                        <label class="form-label">已選擇的 ETF</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span 
+                                v-for="etf in selectedEtfs" 
+                                :key="etf.symbol"
+                                class="selected-etf badge bg-primary fs-6 d-flex align-items-center gap-2"
+                            >
+                                {{ etf.symbol }} - {{ etf.name }}
+                                <button type="button" class="btn-close btn-close-white" v-on:click="removeEtf(etf)"></button>
+                            </span>
+                        </div>
+                        <div v-if="selectedEtfs.length === 0" class="text-muted">
+                            尚未選擇任何 ETF
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 投資組合設定區塊 -->
+            <div id="portfolio-config" class="card shadow-sm mb-4" v-show="backtestMode === 'portfolio'">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">投資組合設定</h5>
+                    
+                    <div class="alert alert-info">
+                        <strong>💡 提示：</strong> 投資組合模式可以設定各 ETF 的配置比例，計算加權平均績效
+                    </div>
+
+                    <!-- 組合成分列表 -->
+                    <div v-for="(item, index) in portfolioItems" :key="index" class="portfolio-item mb-3">
+                        <div class="row align-items-center g-2">
+                            <div class="col-md-5">
+                                <select class="form-select" v-model="item.symbol">
+                                    <option value="">選擇 ETF</option>
+                                    <option v-for="etf in etfList" :key="etf.symbol" :value="etf.symbol">
+                                        {{ etf.symbol }} - {{ etf.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" v-model.number="item.weight" 
+                                           min="1" max="100" placeholder="比例">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-danger btn-sm" v-on:click="removePortfolioItem(index)" 
+                                        v-if="portfolioItems.length > 1">
+                                    移除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-outline-primary btn-sm" v-on:click="addPortfolioItem"
+                                v-bind:disabled="portfolioItems.length >= 5">
+                            + 新增 ETF
+                        </button>
+                        <span :class="totalWeight === 100 ? 'text-success' : 'text-danger'">
+                            總配置: {{ totalWeight }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 回測參數區塊 -->
+            <div id="backtest-params" class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">回測參數設定</h5>
+                    
+                    <div class="row g-3">
+                        <!-- 回測期間 -->
+                        <div class="col-md-4">
+                            <label for="backtest-period" class="form-label">回測期間</label>
+                            <select id="backtest-period" class="form-select" v-model="params.period">
+                                <option value="1">1 年</option>
+                                <option value="3">3 年</option>
+                                <option value="5">5 年</option>
+                                <option value="10">10 年</option>
+                                <option value="20">20 年</option>
+                            </select>
+                        </div>
+
+                        <!-- 投資方式 -->
+                        <div class="col-md-4">
+                            <label for="investment-mode" class="form-label">投資方式</label>
+                            <select id="investment-mode" class="form-select" v-model="params.investmentMode">
+                                <option value="dca">定期定額</option>
+                                <option value="lumpsum">單筆投入</option>
+                            </select>
+                        </div>
+
+                        <!-- 投資金額 -->
+                        <div class="col-md-4">
+                            <label for="investment-amount" class="form-label">
+                                {{ params.investmentMode === 'dca' ? '每月投入金額' : '單筆投入金額' }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">NT$</span>
+                                <input 
+                                    type="number" 
+                                    id="investment-amount" 
+                                    class="form-control" 
+                                    v-model.number="params.amount"
+                                    min="1000"
+                                    step="1000"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 配息再投入選項 -->
+                    <div class="form-check mt-3">
+                        <input 
+                            type="checkbox" 
+                            id="reinvest-dividends" 
+                            class="form-check-input"
+                            v-model="params.reinvestDividends"
+                        >
+                        <label for="reinvest-dividends" class="form-check-label">
+                            配息再投入
+                        </label>
+                    </div>
+
+                    <!-- 開始回測按鈕 -->
+                    <div class="mt-4">
+                        <button 
+                            id="start-backtest"
+                            class="btn btn-primary btn-lg"
+                            v-on:click="startBacktest"
+                            v-bind:disabled="selectedEtfs.length === 0 || loading"
+                        >
+                            <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                            {{ loading ? '計算中...' : '🚀 開始回測' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 結果區塊 -->
+            <div id="backtest-result" v-if="result && result.results.length > 0" class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0">📊 回測結果</h5>
+                        <button id="share-button" class="btn btn-outline-primary btn-sm" v-on:click="shareResult">
+                            📤 分享結果
+                        </button>
+                    </div>
+                    
+                    <!-- 結果卡片 -->
+                    <div class="row g-4">
+                        <div v-for="(r, index) in result.results" :key="r.symbol" class="col-md-6">
+                            <div class="result-card" :class="{ 'winner': isWinner(r) }">
+                                <div class="result-header">
+                                    <span class="etf-badge">{{ r.symbol }}</span>
+                                    <span class="etf-label">{{ r.name }}</span>
+                                    <span v-if="isWinner(r)" class="winner-badge">🏆 勝出</span>
+                                </div>
+                                
+                                <div class="result-body">
+                                    <div class="result-main">
+                                        <div class="result-metric">
+                                            <span class="metric-label">最終資產價值</span>
+                                            <span class="metric-value">{{ formatCurrency(r.finalValue) }}</span>
+                                        </div>
+                                        <div class="result-metric highlight">
+                                            <span class="metric-label">總報酬率</span>
+                                            <span class="metric-value" :class="r.totalReturnPercent >= 0 ? 'positive' : 'negative'">
+                                                {{ r.totalReturnPercent >= 0 ? '+' : '' }}{{ r.totalReturnPercent }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="result-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">總投入本金</span>
+                                            <span class="detail-value">{{ formatCurrency(r.totalInvested) }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">年化報酬率 (CAGR)</span>
+                                            <span class="detail-value">{{ r.cagr }}%</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">最大回撤</span>
+                                            <span class="detail-value text-danger">-{{ r.maxDrawdown }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 績效走勢圖 -->
+                    <div class="mt-4 pt-4 border-top">
+                        <h6 class="mb-3">📈 累積報酬走勢</h6>
+                        <div class="chart-container">
+                            <canvas id="performance-chart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 無結果時的提示 -->
+            <div v-if="!result || result.results.length === 0" class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <p class="text-muted mb-0">選擇 ETF 後點擊「開始回測」查看結果</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.etf-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.etf-group-header {
+    padding: 0.5rem 1rem;
+    background: #f8f9fa;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #6c757d;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.etf-option {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.etf-option:hover {
+    background: #e9ecef;
+}
+
+.etf-symbol {
+    font-weight: 600;
+    color: #7c3aed;
+    min-width: 70px;
+}
+
+.etf-name {
+    color: #495057;
+}
+
+.selected-etf {
+    padding: 0.5rem 0.75rem;
+}
+
+.selected-etf .btn-close {
+    font-size: 0.6rem;
+}
+
+/* Result Card Styles */
+.result-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.result-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.result-card.winner {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.etf-badge {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.etf-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.winner-badge {
+    background: #10b981;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.result-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.result-metric {
+    text-align: center;
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.metric-value.positive {
+    color: #10b981;
+}
+
+.metric-value.negative {
+    color: #ef4444;
+}
+
+.result-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: #374151;
+}
+</style>
+
+@section Scripts {
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="~/js/backtest-calculator.js" asp-append-version="true"></script>
+}
