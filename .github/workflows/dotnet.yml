@@ -1,4 +1,4 @@
-name: .NET Core CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,13 +6,13 @@ on:
   pull_request:
     branches: [ main ]
 
-# OIDC 驗證需要設定的權限
 permissions:
   id-token: write
   contents: read
+  security-events: write
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,25 +42,50 @@ jobs:
       run: dotnet publish Money/Money.csproj --no-build --configuration Release --output ./publish
 
     - name: Upload artifact for deployment
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v4
       with:
         name: dotnet-webapp
         path: ./publish
 
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: csharp, javascript
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Build for CodeQL
+      run: dotnet build Money/Money.csproj --configuration Release
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build-and-test, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-    - name: Download a Build Artifact
-      uses: actions/download-artifact@v6
+    - name: Download artifact
+      uses: actions/download-artifact@v4
       with:
         name: dotnet-webapp
 
-    - name: 'Login to Azure'
+    - name: Login to Azure
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
