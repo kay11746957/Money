@@ -69,5 +69,5 @@ jobs:
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v3
       with:
-        app-name: 'money1208-debsh3f2ergjenb0'
+        app-name: 'money1208'
         package: .
