@@ -167,6 +167,108 @@
                 </div>
             </div>
         </div>
+        
+        <!-- 計算方法說明區塊 -->
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-10">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">📚 計算方法說明</h4>
+                        
+                        <div class="methodology-section mb-4">
+                            <h5 class="text-primary">1️⃣ 退休所需總額計算</h5>
+                            <div class="bg-light p-3 rounded mb-3">
+                                <code>退休所需總額 = 每月提取金額 × 12 × 提領年數</code>
+                            </div>
+                            <p class="text-muted">
+                                此為退休期間所需的總資金，以今日購買力計算。
+                                實際上退休後資金仍會產生投資報酬，因此這是保守估計。
+                            </p>
+                        </div>
+                        
+                        <div class="methodology-section mb-4">
+                            <h5 class="text-primary">2️⃣ 勞保年金計算 (簡易版)</h5>
+                            <div class="bg-light p-3 rounded mb-3">
+                                <code>勞保月領金額 = 平均月投保薪資 × 年資 × 1.55%</code>
+                            </div>
+                            <p class="text-muted">
+                                這是勞保年金的 B 式計算公式，適用於年資較長者。
+                                實際金額建議至 <a href="https://www.bli.gov.tw" target="_blank">勞保局官網</a> 進行精確試算。
+                            </p>
+                        </div>
+                        
+                        <div class="methodology-section mb-4">
+                            <h5 class="text-primary">3️⃣ 每月投資金額計算</h5>
+                            <div class="bg-light p-3 rounded mb-3">
+                                <code>PMT = 缺口金額 ÷ ((((1+r)^n - 1) ÷ r) × (1+r))</code>
+                            </div>
+                            <p class="text-muted">
+                                使用年金公式計算，考慮複利效果。其中 r 為月報酬率，n 為投資月數。
+                                假設每月月初投入且持續投資至退休。
+                            </p>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h4 class="mb-4">💡 計算範例</h4>
+                        
+                        <div class="example-card bg-light p-4 rounded">
+                            <h5 class="mb-3">情境：35 歲上班族，希望 60 歲退休</h5>
+                            
+                            <table class="table table-bordered bg-white">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>每月生活費</strong></td>
+                                        <td>NT$ 40,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>距離退休</strong></td>
+                                        <td>25 年</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>預計提領年數</strong></td>
+                                        <td>25 年 (至 85 歲)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>現有資產</strong></td>
+                                        <td>NT$ 500,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>投資年化報酬率</strong></td>
+                                        <td>7%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="calculation-steps mt-4">
+                                <p><strong>Step 1：計算退休所需總額</strong></p>
+                                <p class="text-muted ps-3">40,000 × 12 × 25 = <strong>NT$ 12,000,000</strong></p>
+                                
+                                <p><strong>Step 2：勞保年金估算</strong> (假設薪資 43,900，年資 30 年)</p>
+                                <p class="text-muted ps-3">43,900 × 30 × 1.55% = <strong>NT$ 20,414/月</strong></p>
+                                <p class="text-muted ps-3">可抵扣：20,414 × 12 × 25 = <strong>NT$ 6,124,200</strong></p>
+                                
+                                <p><strong>Step 3：計算缺口</strong></p>
+                                <p class="text-muted ps-3">12,000,000 - 6,124,200 - 500,000 (現有) = <strong>NT$ 5,375,800</strong></p>
+                                
+                                <p><strong>Step 4：每月需投資金額</strong></p>
+                                <p class="text-muted ps-3">使用年金公式計算 (7% 報酬率，25 年) ≈ <strong>NT$ 6,600/月</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-4">
+                            <strong>⚠️ 注意事項：</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>本計算僅供參考，實際情況可能因市場波動而異</li>
+                                <li>未考慮通膨調整後的實質報酬率差異</li>
+                                <li>勞保年金實際金額可能因政策調整而變動</li>
+                                <li>建議定期重新評估並調整投資計劃</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
