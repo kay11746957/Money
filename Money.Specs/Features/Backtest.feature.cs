@@ -390,6 +390,55 @@ namespace Money.Specs.Features
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("投資組合進階風險指標")]
+        [NUnit.Framework.CategoryAttribute("Backtest")]
+        [NUnit.Framework.CategoryAttribute("PortfolioRiskMetrics")]
+        public void 投資組合進階風險指標()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "Backtest",
+                    "PortfolioRiskMetrics"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("投資組合進階風險指標", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 82
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 83
+    testRunner.Given("我開啟瀏覽器進入 ETF 回測頁面 \"/calculator/backtest\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "假設");
+#line hidden
+#line 84
+    testRunner.When("切換到投資組合模式", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "當");
+#line hidden
+#line 85
+    testRunner.And("點擊開始回測按鈕", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "而且");
+#line hidden
+#line 86
+    testRunner.Then("應該顯示投資組合風險指標區塊", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "那麼");
+#line hidden
+#line 87
+    testRunner.And("應該顯示組合與個別ETF比較表", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "而且");
+#line hidden
+#line 88
+    testRunner.And("組合的年化報酬率應該有數值", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "而且");
+#line hidden
+#line 89
+    testRunner.And("組合的夏普比率應該有數值", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "而且");
+#line hidden
+#line 90
+    testRunner.And("風險指標旁邊應該有解釋圖示", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "而且");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

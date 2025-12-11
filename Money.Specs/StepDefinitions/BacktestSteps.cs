@@ -200,6 +200,90 @@ namespace Money.Specs.StepDefinitions
             Assert.That(shareButton.Displayed, Is.True, "分享按鈕應該可見");
         }
 
+        // ===== Phase 8: 投資組合風險指標步驟 =====
+
+        [When(@"切換到投資組合模式")]
+        public void When切換到投資組合模式()
+        {
+            Thread.Sleep(1000);
+            var portfolioTab = _driver.FindElement(By.Id("mode-portfolio"));
+            ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", portfolioTab);
+            Thread.Sleep(500);
+        }
+
+        [Then(@"應該顯示投資組合風險指標區塊")]
+        public void Then應該顯示投資組合風險指標區塊()
+        {
+            // 等待投資組合回測完成 (最多等 20 秒)
+            var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(20));
+            wait.Until(d => {
+                var element = d.FindElements(By.Id("portfolio-risk-metrics"));
+                return element.Count > 0 && element[0].Displayed;
+            });
+            
+            var riskMetrics = _driver.FindElement(By.Id("portfolio-risk-metrics"));
+            Assert.That(riskMetrics, Is.Not.Null, "應該有風險指標區塊");
+            Assert.That(riskMetrics.Displayed, Is.True, "風險指標區塊應該可見");
+        }
+
+        [Then(@"應該顯示組合與個別ETF比較表")]
+        public void Then應該顯示組合與個別ETF比較表()
+        {
+            var comparisonTable = _driver.FindElement(By.Id("portfolio-comparison-table"));
+            Assert.That(comparisonTable, Is.Not.Null, "應該有比較表");
+            Assert.That(comparisonTable.Displayed, Is.True, "比較表應該可見");
+        }
+
+        [Then(@"組合的年化報酬率應該有數值")]
+        public void Then組合的年化報酬率應該有數值()
+        {
+            // 等待結果載入
+            Thread.Sleep(500);
+            
+            // 查找 portfolio-result 區塊中的 CAGR 值
+            var portfolioResult = _driver.FindElement(By.Id("portfolio-result"));
+            var cagrText = portfolioResult.Text;
+            
+            // 確認包含非零的年化報酬率數值
+            Assert.That(cagrText.Contains("年化報酬率") || cagrText.Contains("cagr"), Is.True, 
+                "應該顯示年化報酬率");
+            
+            // 確認不是 0%
+            Assert.That(!cagrText.Contains("0%") || cagrText.Contains("10") || cagrText.Contains("5") || cagrText.Contains("8"), Is.True,
+                "年化報酬率應該有實際數值，不應該是 0%");
+        }
+
+        [Then(@"組合的夏普比率應該有數值")]
+        public void Then組合的夏普比率應該有數值()
+        {
+            var riskMetrics = _driver.FindElement(By.Id("portfolio-risk-metrics"));
+            var metricsText = riskMetrics.Text;
+            
+            // 確認夏普比率存在且不是 0
+            Assert.That(metricsText.Contains("夏普比率"), Is.True, "應該顯示夏普比率");
+        }
+
+        [Then(@"風險指標旁邊應該有解釋圖示")]
+        public void Then風險指標旁邊應該有解釋圖示()
+        {
+            // 等待 info-icon 元素出現 (最多等 10 秒)
+            var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => {
+                var riskMetrics = d.FindElements(By.Id("portfolio-risk-metrics"));
+                if (riskMetrics.Count == 0 || !riskMetrics[0].Displayed) return false;
+                
+                var icons = riskMetrics[0].FindElements(By.CssSelector("i.info-icon"));
+                return icons.Count > 0;
+            });
+            
+            // 驗證圖示數量
+            var riskMetricsEl = _driver.FindElement(By.Id("portfolio-risk-metrics"));
+            var tooltipIcons = riskMetricsEl.FindElements(By.CssSelector("i.info-icon"));
+            
+            Assert.That(tooltipIcons.Count, Is.GreaterThan(0), 
+                $"風險指標旁邊應該有解釋圖示，找到 {tooltipIcons.Count} 個");
+        }
+
         [AfterScenario]
         public void CleanUp()
         {

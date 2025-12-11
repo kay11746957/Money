@@ -8,6 +8,7 @@ createApp({
             selectedEtfs: [],
             loading: false,
             result: null,
+            portfolioResult: null,
             chart: null,
             backtestMode: 'compare', // 'compare' or 'portfolio'
 
@@ -144,34 +145,55 @@ createApp({
         },
 
         async startBacktest() {
-            if (this.selectedEtfs.length === 0) return;
-
             this.loading = true;
             this.result = null;
+            this.portfolioResult = null;
 
             try {
-                const response = await fetch('/api/backtest', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        symbols: this.selectedEtfs.map(e => e.symbol),
-                        period: parseInt(this.params.period),
-                        investmentMode: this.params.investmentMode,
-                        amount: this.params.amount,
-                        reinvestDividends: this.params.reinvestDividends,
-                    }),
-                });
+                if (this.backtestMode === 'compare') {
+                    // ETF 比較模式
+                    if (this.selectedEtfs.length === 0) return;
 
-                if (!response.ok) {
-                    throw new Error('回測 API 呼叫失敗');
+                    const response = await fetch('/api/backtest', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            symbols: this.selectedEtfs.map(e => e.symbol),
+                            period: parseInt(this.params.period),
+                            investmentMode: this.params.investmentMode,
+                            amount: this.params.amount,
+                            reinvestDividends: this.params.reinvestDividends,
+                        }),
+                    });
+
+                    if (!response.ok) throw new Error('回測 API 呼叫失敗');
+
+                    this.result = await response.json();
+                    console.log('ETF 比較回測完成:', this.result);
+
+                } else {
+                    // 投資組合模式
+                    const validItems = this.portfolioItems.filter(i => i.symbol && i.weight > 0);
+                    if (validItems.length === 0) return;
+
+                    const response = await fetch('/api/backtest/portfolio', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            backtestMode: 'portfolio',
+                            portfolioItems: validItems,
+                            period: parseInt(this.params.period),
+                            investmentMode: this.params.investmentMode,
+                            amount: this.params.amount,
+                            reinvestDividends: this.params.reinvestDividends,
+                        }),
+                    });
+
+                    if (!response.ok) throw new Error('投資組合回測 API 呼叫失敗');
+
+                    this.portfolioResult = await response.json();
+                    console.log('投資組合回測完成:', this.portfolioResult);
                 }
-
-                const data = await response.json();
-                this.result = data;
-
-                console.log('回測完成:', data);
 
                 // 渲染圖表
                 this.$nextTick(() => {
@@ -270,6 +292,28 @@ createApp({
                     }
                 }
             });
+        },
+
+        formatMetric(metricName, value) {
+            if (metricName.includes('報酬') || metricName.includes('波動') || metricName.includes('回撤') || metricName.includes('標準差')) {
+                return value + '%';
+            }
+            return value;
+        },
+
+        getIndividualMetric(metric, symbol) {
+            if (metric.individualValues && metric.individualValues[symbol] !== undefined) {
+                return this.formatMetric(metric.metricName, metric.individualValues[symbol]);
+            }
+            // 從 individualResults 查找
+            const individual = this.portfolioResult?.individualResults?.find(r => r.symbol === symbol);
+            if (!individual) return '-';
+
+            switch (metric.metricName) {
+                case '年化報酬率': return individual.cagr + '%';
+                case '最大回撤': return individual.maxDrawdown + '%';
+                default: return '-';
+            }
         },
     },
 

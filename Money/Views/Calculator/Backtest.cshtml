@@ -281,8 +281,144 @@
                 </div>
             </div>
             
+            <!-- 投資組合結果區塊 (portfolio 模式) -->
+            <div id="portfolio-result" v-if="portfolioResult && backtestMode === 'portfolio'" class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0">💼 投資組合回測結果</h5>
+                        <span class="badge bg-primary">{{ portfolioResult.portfolio.allocation }}</span>
+                    </div>
+                    
+                    <!-- 組合績效摘要 -->
+                    <div class="portfolio-summary mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <span class="metric-label">最終資產價值</span>
+                                    <span class="metric-value">{{ formatCurrency(portfolioResult.portfolio.finalValue) }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <span class="metric-label">總報酬率</span>
+                                    <span class="metric-value text-success">+{{ portfolioResult.portfolio.totalReturnPercent }}%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <span class="metric-label">年化報酬率</span>
+                                    <span class="metric-value">{{ portfolioResult.portfolio.cagr }}%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <span class="metric-label">最大回撤</span>
+                                    <span class="metric-value text-danger">-{{ portfolioResult.portfolio.maxDrawdown }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 進階風險指標區塊 -->
+                    <div id="portfolio-risk-metrics" class="mb-4">
+                        <h6 class="mb-3">📊 進階風險指標</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="risk-metric">
+                                    <span class="risk-label">
+                                        年化波動率
+                                        <i class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="衡量報酬率的總波動性，數值越高代表價格波動越大">ⓘ</i>
+                                    </span>
+                                    <span class="risk-value">{{ portfolioResult.portfolio.annualizedVolatility }}%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="risk-metric">
+                                    <span class="risk-label">
+                                        Beta 值
+                                        <i class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="相對於大盤的敏感度。Beta=1 代表與大盤同步，<1 代表波動較小">ⓘ</i>
+                                    </span>
+                                    <span class="risk-value">{{ portfolioResult.portfolio.beta }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="risk-metric">
+                                    <span class="risk-label">
+                                        夏普比率
+                                        <i class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="每單位風險的超額報酬。>1 為佳，>2 為優秀">ⓘ</i>
+                                    </span>
+                                    <span class="risk-value" :class="portfolioResult.portfolio.sharpeRatio > 0.5 ? 'text-success' : ''">
+                                        {{ portfolioResult.portfolio.sharpeRatio }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="risk-metric">
+                                    <span class="risk-label">
+                                        索提諾比率
+                                        <i class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="只考慮下跌風險的報酬/風險比，比夏普比率更適合評估下跌保護">ⓘ</i>
+                                    </span>
+                                    <span class="risk-value">{{ portfolioResult.portfolio.sortinoRatio }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="risk-metric">
+                                    <span class="risk-label">
+                                        崔納值
+                                        <i class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="每單位系統性風險的超額報酬，適合評估分散投資的效果">ⓘ</i>
+                                    </span>
+                                    <span class="risk-value">{{ portfolioResult.portfolio.treynorRatio }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="risk-metric">
+                                    <span class="risk-label">
+                                        標準差
+                                        <i class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="報酬率的標準差，衡量報酬的離散程度">ⓘ</i>
+                                    </span>
+                                    <span class="risk-value">{{ portfolioResult.portfolio.standardDeviation }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 組合與個別 ETF 比較表 -->
+                    <div id="portfolio-comparison-table" class="mb-4">
+                        <h6 class="mb-3">📋 組合與個別 ETF 比較</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>指標</th>
+                                        <th class="text-center bg-primary text-white">組合</th>
+                                        <th v-for="r in portfolioResult.individualResults" :key="r.symbol" class="text-center">
+                                            {{ r.symbol }}
+                                        </th>
+                                        <th>組合優勢</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="metric in portfolioResult.metricComparisons" :key="metric.metricName">
+                                        <td>
+                                            <span :title="metric.metricDescription">{{ metric.metricName }}</span>
+                                        </td>
+                                        <td class="text-center fw-bold">{{ formatMetric(metric.metricName, metric.portfolioValue) }}</td>
+                                        <td v-for="r in portfolioResult.individualResults" :key="r.symbol" class="text-center">
+                                            {{ getIndividualMetric(metric, r.symbol) }}
+                                        </td>
+                                        <td :class="metric.isPortfolioBetter ? 'text-success' : ''">
+                                            {{ metric.advantage }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 無結果時的提示 -->
-            <div v-if="!result || result.results.length === 0" class="card shadow-sm">
+            <div v-if="(!result || result.results.length === 0) && !portfolioResult" class="card shadow-sm">
                 <div class="card-body text-center py-5">
                     <p class="text-muted mb-0">選擇 ETF 後點擊「開始回測」查看結果</p>
                 </div>
@@ -452,6 +588,85 @@
     font-weight: 600;
     color: #374151;
 }
+
+/* 投資組合風險指標樣式 */
+.metric-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+
+.metric-card .metric-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.metric-card .metric-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.risk-metric {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.risk-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.info-icon {
+    font-style: normal;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    cursor: help;
+    transition: color 0.2s ease;
+}
+
+.info-icon:hover {
+    color: #6366f1;
+}
+
+.risk-value {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1e293b;
+}
+
+#portfolio-comparison-table table {
+    margin-bottom: 0;
+}
+
+#portfolio-comparison-table th,
+#portfolio-comparison-table td {
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+#portfolio-comparison-table .bg-primary {
+    background-color: #7c3aed !important;
+}
+
+.portfolio-summary {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 1rem;
+    padding: 1rem;
+}
 </style>
 
 @section Scripts {
@@ -459,4 +674,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="~/js/backtest-calculator.js" asp-append-version="true"></script>
+    <script>
+        // 初始化 Bootstrap tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            // 使用 MutationObserver 監聽 DOM 變化，因為 Vue 會動態渲染內容
+            const observer = new MutationObserver(function(mutations) {
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                tooltipTriggerList.forEach(el => {
+                    if (!el._tooltip) {
+                        el._tooltip = new bootstrap.Tooltip(el);
+                    }
+                });
+            });
+            
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    </script>
 }

@@ -8,6 +8,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<YahooFinanceService>();
 builder.Services.AddSingleton<DcaCalculatorService>();
 builder.Services.AddScoped<BacktestService>();
+builder.Services.AddScoped<PortfolioBacktestService>();
 
 var app = builder.Build();
 

@@ -23,10 +23,11 @@ Feature: 被動指數投資網站 - 首頁與導覽
 
   @UI @FeatureCards
   Scenario: 功能卡片快速入口
-    Then 功能卡片區應該顯示 2 張卡片:
-      | 卡片標題       | 圖示      | 連結               |
-      | 複利計算機     | 🧮        | /calculator/dca    |
-      | 退休金計算       | 🔥        | /calculator/fire   |
+    Then 功能卡片區應該顯示 3 張卡片:
+      | 卡片標題       | 圖示      | 連結                 |
+      | 複利計算機     | 🧮        | /calculator/dca      |
+      | 退休金計算     | 🔥        | /calculator/fire     |
+      | ETF 回測       | 📊        | /calculator/backtest |
     And 每張卡片應該有 hover 效果 (scale: 1.02, shadow 增強)
     And 卡片間距為 24px
 
