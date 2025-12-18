@@ -15,6 +15,7 @@ builder.Services.AddHttpClient<YahooFinanceService>();
 builder.Services.AddSingleton<DcaCalculatorService>();
 builder.Services.AddScoped<BacktestService>();
 builder.Services.AddScoped<PortfolioBacktestService>();
+builder.Services.AddSingleton<EtfSuggestionService>();
 
 var app = builder.Build();
 

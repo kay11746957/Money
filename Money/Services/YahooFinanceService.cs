@@ -96,6 +96,146 @@ public class YahooFinanceService
         }
     }
 
+    /// <summary>
+    /// 驗證 ETF/股票代碼是否有效
+    /// </summary>
+    public async Task<EtfValidationResult> ValidateSymbolAsync(string symbol)
+    {
+        try
+        {
+            // 正規化代碼 (移除空白、轉大寫)
+            symbol = symbol.Trim().ToUpper();
+
+            // 檢查是否在已知的 ETF 清單中
+            if (EtfInfo.TryGetValue(symbol, out var info))
+            {
+                return new EtfValidationResult
+                {
+                    IsValid = true,
+                    Symbol = symbol,
+                    Name = info.Name,
+                    Type = "ETF",
+                    Market = info.Market,
+                    Message = "代碼有效"
+                };
+            }
+
+            // 嘗試從 Yahoo Finance 查詢
+            var yahooSymbol = DetermineYahooSymbol(symbol);
+            var url = $"https://query1.finance.yahoo.com/v7/finance/quote?symbols={yahooSymbol}";
+            
+            _logger.LogInformation("驗證代碼: {Symbol} (Yahoo: {YahooSymbol})", symbol, yahooSymbol);
+            
+            var response = await _httpClient.GetAsync(url);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                return new EtfValidationResult
+                {
+                    IsValid = false,
+                    Symbol = symbol,
+                    Message = "無法驗證代碼，請確認代碼是否正確"
+                };
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            return ParseValidationResponse(json, symbol);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "驗證代碼失敗: {Symbol}", symbol);
+            return new EtfValidationResult
+            {
+                IsValid = false,
+                Symbol = symbol,
+                Message = "驗證過程發生錯誤"
+            };
+        }
+    }
+
+    /// <summary>
+    /// 決定 Yahoo Finance 的代碼格式
+    /// </summary>
+    private string DetermineYahooSymbol(string symbol)
+    {
+        // 台股代碼 (純數字)
+        if (System.Text.RegularExpressions.Regex.IsMatch(symbol, @"^\d+B?$"))
+        {
+            return $"{symbol}.TW";
+        }
+        
+        // 美股代碼 (字母)
+        return symbol;
+    }
+
+    /// <summary>
+    /// 解析 Yahoo Finance 驗證回應
+    /// </summary>
+    private EtfValidationResult ParseValidationResponse(string json, string originalSymbol)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            var quoteResponse = root.GetProperty("quoteResponse");
+            var result = quoteResponse.GetProperty("result");
+
+            if (result.GetArrayLength() == 0)
+            {
+                return new EtfValidationResult
+                {
+                    IsValid = false,
+                    Symbol = originalSymbol,
+                    Message = "找不到此代碼"
+                };
+            }
+
+            var quote = result[0];
+            var quoteType = quote.TryGetProperty("quoteType", out var qt) ? qt.GetString() ?? "" : "";
+            var longName = quote.TryGetProperty("longName", out var ln) ? ln.GetString() ?? "" : "";
+            var shortName = quote.TryGetProperty("shortName", out var sn) ? sn.GetString() ?? "" : "";
+            var currency = quote.TryGetProperty("currency", out var cur) ? cur.GetString() ?? "" : "";
+            var exchange = quote.TryGetProperty("exchange", out var ex) ? ex.GetString() ?? "" : "";
+            
+            decimal? price = null;
+            if (quote.TryGetProperty("regularMarketPrice", out var rmp) && rmp.ValueKind != JsonValueKind.Null)
+            {
+                price = rmp.GetDecimal();
+            }
+
+            // 判斷市場
+            var market = exchange.Contains("TAI") || exchange.Contains("TPE") ? "TW" : "US";
+
+            return new EtfValidationResult
+            {
+                IsValid = true,
+                Symbol = originalSymbol,
+                Name = !string.IsNullOrEmpty(longName) ? longName : shortName,
+                Type = quoteType,
+                Market = market,
+                Message = "代碼有效",
+                Details = new EtfDetailInfo
+                {
+                    FullName = longName,
+                    Currency = currency,
+                    Exchange = exchange,
+                    RegularMarketPrice = price
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "解析驗證回應失敗");
+            return new EtfValidationResult
+            {
+                IsValid = false,
+                Symbol = originalSymbol,
+                Message = "解析回應失敗"
+            };
+        }
+    }
+
     private EtfHistoricalData? ParseYahooResponse(string json, string symbol, string name)
     {
         try
